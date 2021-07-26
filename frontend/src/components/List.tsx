@@ -7,8 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { IData } from '../models/Data.interface';
-import ListService from '../services/List.service';
+import DataClass from '../models/Data';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -38,7 +37,7 @@ const useStyles = makeStyles({
   },
 });
 
-const CustomizedTable: React.FC<{listData: IData[]}> = (props) => {
+const CustomizedTable: React.FC<{listData: DataClass[]}> = (props) => {
   const classes = useStyles();
 
   return (
