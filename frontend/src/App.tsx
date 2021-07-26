@@ -17,7 +17,7 @@ function App() {
   }, []);
 
   const useBackendData: DataClass[] = backendData.map( (data: any) => {
-    return new DataClass(data.id, data.title, data.body);
+    return new DataClass(data.dataId, data.producer, data.model);
   })
 
   const useHardcodedData = [
@@ -29,8 +29,12 @@ function App() {
 
   return (
     <>
+      <h3>Hardcoded data:</h3>
+      <hr/><br/>
       <List listData={useHardcodedData}/>
       <br/>
+      <h3>Backend data:</h3>
+      <hr/><br/>
       <List listData={useBackendData}/>
     </>
   );

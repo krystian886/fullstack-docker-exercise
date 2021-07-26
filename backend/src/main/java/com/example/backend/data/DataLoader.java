@@ -17,7 +17,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         var toInsert1 = new Data("Ford", "T");
-        var toInsert2 = new Data("BMW", "X5");
+        var toInsert2 = new Data("BMW", "x5");
         var toInsert3 = new Data("Audi", "a3");
 
         this.dataRepository.save(toInsert1);
