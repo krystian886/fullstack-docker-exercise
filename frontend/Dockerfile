@@ -23,9 +23,9 @@ RUN chown -R node.node /app
 # add app
 COPY . ./
 
-# Expose port 80 to the Docker host, so we can access it 
+# Expose port 3000 to the Docker host, so we can access it 
 # from the outside.
-EXPOSE 80
+EXPOSE 3000
 
 # start app
 CMD ["npm", "start"]

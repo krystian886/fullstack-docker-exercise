@@ -12,7 +12,7 @@ services:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: always
     depends_on: 
-      - db # This service depends on postgreSQL. Start that first.
+      - postgres # This service depends on postgreSQL. Start that first.
     environment: # Pass environment variables to the service
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
@@ -29,7 +29,7 @@ services:
       args:
         REACT_APP_API_BASE_URL: http://127.0.0.1:8080/api
     ports:
-      - "9090:80" # Map the exposed port 80 on the container to port 9090 on the host machine
+      - "9090:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
     restart: always
     depends_on:
       - app-server
