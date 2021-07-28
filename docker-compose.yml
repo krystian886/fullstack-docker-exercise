@@ -1,0 +1,64 @@
+version: '3.7'
+
+# Define services
+services:
+  # App backend service
+  app-server:
+    # Configuration for building the docker image for the backend service
+    build:
+      context: backend # Use an image built from the specified dockerfile in the `backend` directory.
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: always
+    depends_on: 
+      - db # This service depends on postgreSQL. Start that first.
+    environment: # Pass environment variables to the service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: passwd     
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backendNetwork
+      - frontendNetwork
+
+  # Frontend Service 
+  app-client:
+    build:
+      context: frontend # Use an image built from the specified dockerfile in the `frontend` directory.
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: http://127.0.0.1:8080/api
+    ports:
+      - "9090:80" # Map the exposed port 80 on the container to port 9090 on the host machine
+    restart: always
+    depends_on:
+      - app-server
+    networks:
+      - frontendNetwork
+
+  # Database Service (postgreSQL)
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=passwd
+    logging:
+        options:
+            max-size: 10m
+            max-file: "3"    
+    volumes: 
+        - ./postgres-data:/var/lib/postgresql/data
+    networks:
+        - backendNetwork  
+  
+# Volumes
+volumes:
+  db-data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  backendNetwork:
+  frontendNetwork:
