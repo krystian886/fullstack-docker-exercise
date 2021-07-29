@@ -1,25 +1,26 @@
 version: '3.7'
 
-# Define services
 services:
-  # App backend service
+  # Backend service
   app-server:
     # Configuration for building the docker image for the backend service
     build:
       context: backend # Use an image built from the specified dockerfile in the `backend` directory.
       dockerfile: Dockerfile
+    image: backend-server:latest
+    container_name: spring-boot-server
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: always
     depends_on: 
       - postgres # This service depends on postgreSQL. Start that first.
     environment: # Pass environment variables to the service
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: passwd     
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
-      - backendNetwork
-      - frontendNetwork
+      - backend_network
+      - frontend_network
 
   # Frontend Service 
   app-client:
@@ -28,17 +29,19 @@ services:
       dockerfile: Dockerfile
       args:
         REACT_APP_API_BASE_URL: http://127.0.0.1:8080/api
+    container_name: react-client
     ports:
-      - "9090:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
+      - "3000:3000" # Map the exposed port 80 on the container to port 9090 on the host machine
     restart: always
     depends_on:
       - app-server
     networks:
-      - frontendNetwork
+      - frontend_network
 
-  # Database Service (postgreSQL)
+  # Database Service
   postgres:
-    image: postgres
+    image: 'postgres:13.1-alpine'
+    container_name: postgres-database
     restart: always
     ports:
       - '5432:5432'
@@ -49,16 +52,18 @@ services:
         options:
             max-size: 10m
             max-file: "3"    
-    volumes: 
-        - ./postgres-data:/var/lib/postgresql/data
+    volumes:
+       - db-data:/var/lib/mysql
     networks:
-        - backendNetwork  
+        - backend_network  
   
-# Volumes
+# Volumes for persisting data
 volumes:
   db-data:
 
 # Networks to be created to facilitate communication between containers
 networks:
-  backendNetwork:
-  frontendNetwork:
+  backend_network:
+    driver: bridge
+  frontend_network:
+    driver: bridge
