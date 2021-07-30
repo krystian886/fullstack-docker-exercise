@@ -7,7 +7,8 @@ List of content
 - [Intro](#Intro)
 - [Frontend container](#Frontend-container)
 - [Backend container](#Backend-container)
-    - [Maven issue](#Maven-issue)
+    - [The instruction](#The-instruction)
+    - [The alternative way](#The-alternative-way)
     - [Container dependency](#Container-dependency)
 - [Docker-compose](#Docker-compose)
     - [Result](#Result)
@@ -31,20 +32,9 @@ If run alone, will create an app and display only hardcoded data:
 <br><br>
 
 # Backend container
-Here is where things get a little complicated.<br>
+Docker to start a java application needs a .jar file. Here things can be done in many ways. The one below automatically creates database and fills it with data <b>BUT</b> requires additional steps to create the .jar file.<br>
 
-## Maven issue
-Because this project was created in Win10/WSL2, there was an error, which unfortunately prevented from achieving full automation:<br>
-Docker, to run a java application, needs a .jar file. To create it in terminal, a programme called maven is required. However running maven in Dockerfile (Win10/WSL2) turns out to be not a trivial task.
-
-![sceenshot_7](/img/7.png)
-<br><br>
-Here is more on this topic:<br>
-https://stackoverflow.com/questions/61226664/build-docker-error-bin-sh-1-mvnw-not-found <br>
-https://stackoverflow.com/questions/52748640/unable-to-run-mvnw-clean-install-when-building-docker-image-based-on-openjd/52748878<br>
-
-<b>!!So instead .jar file is required to be created manually!!</b><br>
-Here is the instruction:<br>
+## The instruction<br>
 1. run database container:<br>
 'docker run -e POSTGRES_PASSWORD=passwd -e POSTGRES_USER=postgres -d -p 5433:5432 postgres'<br>
 2. in <u>/backend/src/main/resources/application.properties</u> uncomment this section:<br>
@@ -54,23 +44,33 @@ Here is the instruction:<br>
 5. stop and delete database container:<br>
 docker stop <u>id</u> -> docker rm <u>id</u> -> docker rmi <u>id</u>
 
-That's it, the rest is automated
+It must be done separately, because docker-compose can controll which containers are run first but <b>it can not always controll</b> the order of when they are build. And backend container needs database container to already be up and running to properly create .jar file.
 
-<b>!!</b><br>
-An alternative approach would be to create everything directly in Dockerfile, for example:<br>
-Ubuntu, java and maven, but my goal here was to keep it small in size and suitable for my needs.
+## The alternative way
+To automate it all it would be required to:
+1. set in /backend/src/main/resources/application.properties<br>
+<b>spring.jpa.hibernate.ddl-auto=none</b><br>
+2. change backend/Dockerfile to download maven, create .jar and run it<br>(example)
+
+![sceenshot_9](/img/9.png)
+
+3. create schema.sql to recreate the database and data.sql to fill it
+4. modify docker-compose.yml to run it all
+
+But then everytime the database changes, there are at least 2 additional files to change what slows the development
 
 ## Container dependency
-Just to remind.. The backend container requires connection to the database and is unable to work without it, so if started, will throw an error:
+Just a reminder.. The backend container requires connection to the database and is unable to work without it, so if started alone, will throw an error:
 
 ![sceenshot_6](/img/6.png)
 <br>
-That is where the docker compose enters the stage..
+That is where the docker compose comes in..
+
 
 # Docker-compose
 
 To run the whole application 2 steps are required:<br>
-1. create .jar file in backend (see Backend container -> Maven issue)<br>
+1. create .jar file in backend (see Backend container -> The instruction)<br>
 2. run 'docker-compose up' in terminal
 <br><br>
 and that's all
