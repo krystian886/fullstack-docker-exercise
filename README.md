@@ -56,6 +56,10 @@ docker stop <u>id</u> -> docker rm <u>id</u> -> docker rmi <u>id</u>
 
 That's it, the rest is automated
 
+<b>!!</b><br>
+An alternative approach would be to create everything directly in Dockerfile, for example:<br>
+Ubuntu, java and maven, but my goal here was to keep it small in size and suitable for my needs.
+
 ## Container dependency
 Just to remind.. The backend container requires connection to the database and is unable to work without it, so if started, will throw an error:
 
