@@ -16,7 +16,7 @@ List of content
 # Intro
 
 <h2>Stack:</h2>
-&ensp;frontend: React.js/Typescript<br>
+&ensp;frontend: React/Typescript/MaterialUI<br>
 &ensp;backend: Spring Boot<br>
 &ensp;database: postgreSQL<br><br>
 
